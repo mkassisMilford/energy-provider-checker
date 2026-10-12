@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auckland Energy Provider Checker</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; color: #333; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); overflow: hidden; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px; text-align: center; }
+        .header h1 { font-size: 2.5em; margin-bottom: 10px; }
+        .header p { font-size: 1.1em; opacity: 0.9; margin-bottom: 20px; }
+        .data-info { background: rgba(255,255,255,0.2); padding: 15px 20px; border-radius: 6px; font-size: 0.95em; display: inline-block; }
+        .data-info strong { color: #ffc107; }
+        .content { padding: 40px; }
+        .usage-section { background: #f8f9fa; padding: 25px; border-radius: 8px; margin-bottom: 30px; border-left: 4px solid #667eea; }
+        .usage-section h2 { font-size: 1.3em; margin-bottom: 20px; color: #667eea; }
+        .input-group { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        .input-field { display: flex; flex-direction: column; }
+        .input-field label { font-weight: 600; margin-bottom: 8px; color: #333; }
+        .input-field input { padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 1em; }
+        .input-field input:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,0.1); }
+        .providers-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 30px; }
+        .provider-card { border: 1px solid #ddd; border-radius: 8px; padding: 25px; transition: all 0.3s; position: relative; }
+        .provider-card:hover { box-shadow: 0 10px 30px rgba(102,126,234,0.2); transform: translateY(-5px); border-color: #667eea; }
+        .provider-card.best { border: 2px solid #ffc107; background: #fffbf0; }
+        .provider-card.best::before { content: '⭐ BEST RATE'; position: absolute; top: 10px; right: 10px; background: #ffc107; color: #333; padding: 5px 10px; border-radius: 4px; font-weight: 600; font-size: 0.9em; }
+        .provider-card.current { border: 2px solid #28a745; background: #f0fff4; }
+        .provider-card.current::after { content: '📍 YOUR CURRENT'; position: absolute; top: 10px; right: 10px; background: #28a745; color: white; padding: 5px 10px; border-radius: 4px; font-weight: 600; font-size: 0.9em; }
+        .provider-name { font-size: 1.4em; font-weight: 700; margin-bottom: 15px; color: #333; margin-top: 20px; }
+        .provider-cost { font-size: 2em; font-weight: 700; color: #667eea; margin-bottom: 10px; }
+        .provider-cost-label { color: #666; font-size: 0.9em; }
+        .savings { background: #e8f5e9; color: #2e7d32; padding: 10px; border-radius: 4px; margin: 15px 0; font-weight: 600; }
+        .savings.negative { background: #ffebee; color: #c62828; }
+        .plan-info { font-size: 0.95em; color: #666; margin: 15px 0; line-height: 1.6; }
+        .plan-info strong { color: #333; }
+        .rating { background: #f0f4ff; padding: 10px; border-radius: 4px; font-size: 0.9em; color: #667eea; font-weight: 500; }
+        .highlights { margin-top: 15px; font-size: 0.9em; }
+        .highlights ul { list-style: none; }
+        .highlights li { padding: 5px 0; color: #666; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 8px; }
+        .highlights li:before { content: '✓ '; color: #667eea; font-weight: 600; margin-right: 5px; }
+        .highlights li:last-child { border-bottom: none; margin-bottom: 0; }
+        .summary { background: #f0f4ff; padding: 25px; border-radius: 8px; margin-top: 30px; border-left: 4px solid #667eea; }
+        .summary h3 { color: #667eea; margin-bottom: 15px; font-size: 1.2em; }
+        .summary-item { padding: 10px 0; color: #333; font-size: 1.05em; }
+        .summary-item strong { color: #667eea; }
+        .cost-breakdown { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 15px 0; }
+        .cost-item { background: white; padding: 12px; border-radius: 6px; border-left: 3px solid #667eea; }
+        .cost-item-label { font-size: 0.9em; color: #666; }
+        .cost-item-value { font-size: 1.3em; font-weight: 600; color: #667eea; margin-top: 5px; }
+        .cost-item.electricity { border-left-color: #ff9800; }
+        .cost-item.gas { border-left-color: #e91e63; }
+        .provider-itemized { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0; font-size: 0.9em; }
+        .provider-itemized-item { background: #f5f5f5; padding: 8px; border-radius: 4px; }
+        .provider-itemized-label { color: #666; font-size: 0.85em; }
+        .provider-itemized-value { font-weight: 600; color: #333; margin-top: 3px; }
+        .header-controls { display: flex; justify-content: center; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 18px; }
+        .update-btn { background: #ffc107; color: #333; border: none; padding: 10px 18px; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 0.95em; transition: all 0.2s ease; }
+        .update-btn:hover { background: #ffb300; transform: translateY(-1px); }
+        .update-btn:disabled { opacity: 0.65; cursor: not-allowed; transform: none; }
+        .status { min-height: 20px; font-size: 0.9em; color: #ffc107; font-weight: 500; }
+        .footer { text-align: center; padding: 20px; background: #f8f9fa; color: #666; font-size: 0.9em; border-top: 1px solid #ddd; }
+        @media (max-width: 768px) { .header h1 { font-size: 1.8em; } .input-group { grid-template-columns: 1fr; } .providers-grid { grid-template-columns: 1fr; } .content { padding: 20px; } .cost-breakdown { grid-template-columns: 1fr; } .provider-itemized { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚡ Auckland Energy Provider Checker</h1>
+            <p>Find the best energy deal for your household</p>
+            <div class="data-info">
+                📅 Data Updated: <strong id="dataDate">October 12, 2026 at 11:35 PM</strong>
+            </div>
+            <div class="header-controls">
+                <button class="update-btn" id="updateBtn" type="button">🔄 Update Now</button>
+                <div class="status" id="status"></div>
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="usage-section">
+                <h2>📊 Your Monthly Usage</h2>
+                <div class="input-group">
+                    <div class="input-field">
+                        <label for="electricity">Electricity (kWh/month)</label>
+                        <input type="number" id="electricity" value="385" min="0" max="2000" step="1">
+                    </div>
+                    <div class="input-field">
+                        <label for="gas">Gas (kWh/month)</label>
+                        <input type="number" id="gas" value="270" min="0" max="2000" step="1">
+                    </div>
+                </div>
+                
+                <div style="margin-top: 20px; padding: 20px; background: #fff9e6; border-left: 4px solid #ffc107; border-radius: 4px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 10px; color: #333;">📄 Or extract from your bill:</label>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <input type="file" id="billUpload" accept=".pdf" style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;">
+                        <button id="uploadBtn" style="padding: 10px 20px; background: #ffc107; color: #333; border: none; border-radius: 4px; font-weight: 600; cursor: pointer; white-space: nowrap;">Extract Data</button>
+                    </div>
+                    <p style="color: #666; font-size: 0.85em; margin-top: 8px;">✓ Supports: Genesis, Mercury, Contact, Meridian, Powershop, Vector</p>
+                    <div id="uploadStatus" style="margin-top: 10px; display: none; padding: 10px; border-radius: 4px; font-size: 0.9em;"></div>
+                </div>
+                
+                <p style="color: #666; font-size: 0.95em; margin-top: 15px;">💡 <strong>Tip:</strong> Your bill data is extracted locally and never stored</p>
+            </div>
+            
+            <div class="summary">
+                <h3>Your Current Estimate</h3>
+                <div class="summary-item">Monthly usage: <strong id="usageDisplay">385 kWh/month electricity, 270 kWh/month gas</strong></div>
+                <div class="cost-breakdown">
+                    <div class="cost-item electricity">
+                        <div class="cost-item-label">⚡ Electricity Annual Cost</div>
+                        <div class="cost-item-value" id="estimatedElecCost">$1,472.55</div>
+                    </div>
+                    <div class="cost-item gas">
+                        <div class="cost-item-label">🔥 Gas Annual Cost</div>
+                        <div class="cost-item-value" id="estimatedGasCost">$1,236.40</div>
+                    </div>
+                </div>
+                <div class="cost-breakdown">
+                    <div class="cost-item electricity">
+                        <div class="cost-item-label">⚡ Electricity Daily Charge</div>
+                        <div class="cost-item-value" id="estimatedElecDailyCharge">$1.25/day</div>
+                    </div>
+                    <div class="cost-item gas">
+                        <div class="cost-item-label">🔥 Gas Daily Charge</div>
+                        <div class="cost-item-value" id="estimatedGasDailyCharge">$0.51/day</div>
+                    </div>
+                </div>
+                <div class="summary-item">Total annual cost: <strong id="estimatedCost">$2,708.95</strong></div>
+                
+                <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(102, 126, 234, 0.2);">
+                    <label for="compareProvider" style="font-weight: 600; color: #667eea; display: block; margin-bottom: 10px;">📊 Compare with another provider:</label>
+                    <select id="compareProvider" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 1em; margin-bottom: 15px;">
+                        <option value="">-- Select a provider to compare --</option>
+                    </select>
+                    
+                    <div id="comparisonDetails" style="display: none;">
+                        <h4 style="color: #667eea; margin: 15px 0 10px 0; font-size: 1.05em;">Itemized Comparison: Genesis Energy (Your Current) vs <span id="compareProviderName"></span></h4>
+                        <div style="background: white; border: 1px solid #ddd; border-radius: 6px; overflow: hidden;">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 0;">
+                                <div style="padding: 12px; border-right: 1px solid #ddd; border-bottom: 1px solid #ddd; font-weight: 600; background: #f8f9fa;">Item</div>
+                                <div style="padding: 12px; border-right: 1px solid #ddd; border-bottom: 1px solid #ddd; font-weight: 600; background: #f8f9fa; text-align: center;">Genesis (Current)</div>
+                                <div style="padding: 12px; border-right: 1px solid #ddd; border-bottom: 1px solid #ddd; font-weight: 600; background: #f8f9fa; text-align: center;" id="compareHeaderName"></div>
+                                <div style="padding: 12px; border-bottom: 1px solid #ddd; font-weight: 600; background: #f8f9fa; text-align: center;">Difference</div>
+                                
+                                <div style="padding: 12px; border-right: 1px solid #ddd;">Electricity Rate</div>
+                                <div style="padding: 12px; border-right: 1px solid #ddd; text-align: center;" id="genesisElecRate">31.75¢</div>
+                                <div style="padding: 12px; border-right: 1px solid #ddd; text-align: center;" id="compareElecRate">--</div>
+                                <div style="padding: 12px; text-align: center; color: #2e7d32;" id="compareElecRateDiff">--</div>
+                                
+                                <div style="padding: 12px; border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;">Gas Rate</div>
+                                <div style="padding: 12px; border-right: 1px solid #ddd; border-bottom: 1px solid #ddd; text-align: center;" id="genesisGasRate">18.45¢</div>
+                                <div style="padding: 12px; border-right: 1px solid #ddd; border-bottom: 1px solid #ddd; text-align: center;" id="compareGasRate">--</div>
+                                <div style="padding: 12px; border-bottom: 1px solid #ddd; text-align: center; color: #2e7d32;" id="compareGasRateDiff">--</div>
+
+                                <div style="padding: 12px; border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;">Electricity Daily Charge</div>
+                                <div style="padding: 12px; border-right: 1px solid #ddd; border-bottom: 1px solid #ddd; text-align: center;" id="genesisElecDailyCharge">--</div>
+                                <div style="padding: 12px; border-right: 1px solid #ddd; border-bottom: 1px solid #ddd; text-align: center;" id="compareElecDailyCharge">--</div>
+                                <div style="padding: 12px; border-bottom: 1px solid #ddd; text-align: center; color: #2e7d32;" id="compareElecDailyChargeDiff">--</div>
+
+                                <div style="padding: 12px; border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;">Gas Daily Charge</div>
+                                <div style="padding: 12px; border-right: 1px solid #ddd; border-bottom: 1px solid #ddd; text-align: center;" id="genesisGasDailyCharge">--</div>
+                                <div style="padding: 12px; border-right: 1px solid #ddd; border-bottom: 1px solid #ddd; text-align: center;" id="compareGasDailyCharge">--</div>
+                                <div style="padding: 12px; border-bottom: 1px solid #ddd; text-align: center; color: #2e7d32;" id="compareGasDailyChargeDiff">--</div>
+                                
+                                <div style="padding: 12px; border-right: 1px solid #ddd; font-weight: 600;">Annual Cost</div>
+                                <div style="padding: 12px; border-right: 1px solid #ddd; text-align: center; font-weight: 600;" id="genesisAnnualCost">$2,708.95</div>
+                                <div style="padding: 12px; border-right: 1px solid #ddd; text-align: center; font-weight: 600;" id="compareAnnualCost">--</div>
+                                <div style="padding: 12px; text-align: center; font-weight: 600; color: #2e7d32;" id="compareAnnualSavings">--</div>
+                            </div>
+                            <div style="padding: 12px; font-size: 0.9em; color: #666; background: #fafafa;">
+                                Annual cost includes usage charges, daily charges, and any discount applied to the full bill.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <h2 style="margin-top: 40px; margin-bottom: 20px; color: #333;">All Providers - Ranked by Annual Cost</h2>
+            <div class="providers-grid" id="providersGrid"></div>
+        </div>
+        
+        <div class="footer">
+            📊 Data Source: Powerswitch.org.nz | Last Updated: <span id="lastUpdated">October 12, 2026 at 11:35 PM</span>
+        </div>
+    </div>
+    
+    <script>
+        let providersData = null;
+
+        async function loadProvidersData() {
+            const response = await fetch('providers_data.json', { cache: 'no-store' });
+            if (!response.ok) {
+                throw new Error('Could not load provider data');
+            }
+            return await response.json();
+        }
+
+        function normalizePdfText(text) {
+            return (text || '').replace(/\s+/g, ' ').trim();
+        }
+
+        function extractFirstFloat(text, patterns) {
+            for (const pattern of patterns) {
+                const match = text.match(pattern);
+                if (match && match[1]) {
+                    const value = Number(match[1]);
+                    if (Number.isFinite(value)) {
+                        return value;
+                    }
+                }
+            }
+            return null;
+        }
+
+        function extractBillUsageFromText(fullText) {
+            const normalizedText = normalizePdfText(fullText);
+            const electricityPatterns = [
+                /Current\s+Elec\s*tricity\s+Usage.*?Plus\s+Low\s+Composite.*?(\d+(?:\.\d+)?)\s*@\s*[\d.]+\s*c\/unit/i,
+                /Current\s+Elec\s*tricity\s+Usage.*?(\d+(?:\.\d+)?)\s*@\s*[\d.]+\s*c\/unit/i,
+                /Plus\s+Low\s+Composite.*?(\d+(?:\.\d+)?)\s*@\s*[\d.]+\s*c\/unit/i,
+                /Current\s+Electricity\s+Usage.*?Units?\s+Used.*?(\d+(?:\.\d+)?)\s*@/i
+            ];
+            const gasPatterns = [
+                /Current\s+Natural\s+Gas\s+Usage.*?Plus\s+Standard\s+Variable\s+(\d+(?:\.\d+)?)\s*kWh/i,
+                /Current\s+Natural\s+Gas\s+Usage.*?(\d+(?:\.\d+)?)\s*kWh/i,
+                /Plus\s+Standard\s+Variable\s+(\d+(?:\.\d+)?)\s*kWh/i
+            ];
+
+            const result = {
+                electricity: extractFirstFloat(normalizedText, electricityPatterns),
+                gas: extractFirstFloat(normalizedText, gasPatterns)
+            };
+
+            if (result.electricity === null || result.gas === null) {
+                const genericPatterns = {
+                    electricity: [
+                        /(?:Total\s+)?[Ee]lectricity.*?(\d+(?:\.\d+)?)\s*kWh/i,
+                        /[Ee]lectricity\s+(?:usage|consumption|units).*?(\d+(?:\.\d+)?)/i,
+                        /[Ee]lectric.*?(?:usage|consumption|units|used).*?(\d+(?:\.\d+)?)/i,
+                        /[Uu]nits\s+[Uu]sed.*?(\d+(?:\.\d+)?)\s*kWh/i,
+                        /[Ee]nergy\s+(?:used|supplied).*?(\d+(?:\.\d+)?)/i,
+                        /(?:Electricity|Electric)\s*[:\-]?\s*(\d+(?:\.\d+)?)\s*kWh/i
+                    ],
+                    gas: [
+                        /(?:Total\s+)?[Gg]as.*?(\d+(?:\.\d+)?)\s*kWh/i,
+                        /[Gg]as\s+(?:usage|consumption|units).*?(\d+(?:\.\d+)?)/i,
+                        /[Gg]as\s+consumption.*?(\d+(?:\.\d+)?)/i,
+                        /[Gg]as\s*[:\-]?\s*(\d+(?:\.\d+)?)\s*kWh/i
+                    ]
+                };
+
+                if (result.electricity === null) {
+                    result.electricity = extractFirstFloat(normalizedText, genericPatterns.electricity);
+                }
+                if (result.gas === null) {
+                    result.gas = extractFirstFloat(normalizedText, genericPatterns.gas);
+                }
+            }
+
+            if (result.electricity === null || result.gas === null) {
+                throw new Error('Could not extract both electricity and gas usage from this PDF.');
+            }
+
+            if (result.electricity < 1 || result.electricity > 2000 || result.gas < 1 || result.gas > 2000) {
+                throw new Error('Extracted values look invalid. Please upload a clearer bill or enter the numbers manually.');
+            }
+
+            return result;
+        }
+
+        async function extractUsageFromPdfFile(file) {
+            if (typeof pdfjsLib === 'undefined') {
+                throw new Error('PDF extraction library failed to load.');
+            }
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+            const data = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({ data: data }).promise;
+            let fullText = '';
+            for (let i = 1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const content = await page.getTextContent();
+                fullText += content.items.map(function (item) { return item.str; }).join(' ') + '\n';
+            }
+            return extractBillUsageFromText(fullText);
+        }
+        
+        const providerAnnualTargets = {
+            "Mercury Energy": 2706.0,
+            "Genesis Energy": 2708.95,
+            "Contact Energy": 2829.0,
+            "Meridian Energy": 2854.0,
+            "Powershop": 2899.0,
+            "Vector Energy": 2940.0
+        };
+        const providerDailyChargeTargets = {
+            "Mercury Energy": { electricity: 1.27, gas: 0.52 },
+            "Genesis Energy": { electricity: 1.25, gas: 0.51 },
+            "Contact Energy": { electricity: 1.38, gas: 0.57 },
+            "Meridian Energy": { electricity: 1.38, gas: 0.56 },
+            "Powershop": { electricity: 1.40, gas: 0.57 },
+            "Vector Energy": { electricity: 1.40, gas: 0.58 }
+        };
+
+        function getProviderCostComponents(provider, electricity, gas) {
+            const defaultElectricity = providersData.consumption?.electricity_kwh_month || 385;
+            const defaultGas = providersData.consumption?.gas_kwh_month || 270;
+            const defaultElecUsage = defaultElectricity * 12 * provider.electricityRate;
+            const defaultGasUsage = defaultGas * 12 * provider.gasRate;
+            const defaultUsageTotal = defaultElecUsage + defaultGasUsage;
+            const targetAnnual = provider.annual_cost || provider.annualCost || providerAnnualTargets[provider.name];
+            const fixedAnnualBasis = providerAnnualTargets[provider.name] || targetAnnual;
+            const discountFactor = provider.discount && provider.discount.percentage ? (1 - provider.discount.percentage / 100) : 1;
+            const baseAnnual = fixedAnnualBasis / discountFactor;
+            const fixedAnnual = Math.max(baseAnnual - defaultUsageTotal, 0);
+            const elecShare = defaultUsageTotal > 0 ? (defaultElecUsage / defaultUsageTotal) : 0.5;
+            const gasShare = defaultUsageTotal > 0 ? (defaultGasUsage / defaultUsageTotal) : 0.5;
+            const fallbackDaily = providerDailyChargeTargets[provider.name] || { electricity: 0, gas: 0 };
+            const fixedElectricityDaily = fixedAnnual > 0 ? (fixedAnnual * elecShare) / 365 : fallbackDaily.electricity;
+            const fixedGasDaily = fixedAnnual > 0 ? (fixedAnnual * gasShare) / 365 : fallbackDaily.gas;
+
+            const electricityUsage = electricity * 12 * provider.electricityRate;
+            const gasUsage = gas * 12 * provider.gasRate;
+            const preDiscountTotal = electricityUsage + gasUsage + fixedAnnual;
+            const total = targetAnnual || (preDiscountTotal * discountFactor);
+
+            return {
+                electricityUsage: Math.round(electricityUsage * 100) / 100,
+                gasUsage: Math.round(gasUsage * 100) / 100,
+                electricityDailyCharge: Math.round(fixedElectricityDaily * 100) / 100,
+                gasDailyCharge: Math.round(fixedGasDaily * 100) / 100,
+                total: Math.round(total * 100) / 100
+            };
+        }
+        
+        function calculateCost(provider, electricity, gas) {
+            return getProviderCostComponents(provider, electricity, gas).total;
+        }
+        
+        function calculateItemizedCost(provider, electricity, gas) {
+            const components = getProviderCostComponents(provider, electricity, gas);
+            return {
+                electricity: components.electricityUsage,
+                gas: components.gasUsage,
+                electricityDailyCharge: components.electricityDailyCharge,
+                gasDailyCharge: components.gasDailyCharge,
+                total: components.total
+            };
+        }
+
+        async function updateRates() {
+            const btn = document.getElementById('updateBtn');
+            const status = document.getElementById('status');
+
+            btn.disabled = true;
+            status.textContent = '🔄 Refreshing published data...';
+
+            try {
+                providersData = await loadProvidersData();
+                document.getElementById('dataDate').textContent = providersData.last_updated;
+                document.getElementById('lastUpdated').textContent = providersData.last_updated;
+                updateDisplay();
+                status.textContent = '✅ Updated successfully';
+                setTimeout(function () { status.textContent = ''; }, 2500);
+            } catch (error) {
+                status.textContent = '❌ ' + error.message;
+            } finally {
+                btn.disabled = false;
+            }
+        }
+        
+        function updateDisplay() {
+            if (!providersData) {
+                return;
+            }
+            const electricity = parseFloat(document.getElementById('electricity').value) || 385;
+            const gas = parseFloat(document.getElementById('gas').value) || 270;
+            
+            document.getElementById('usageDisplay').textContent = `${electricity} kWh/month electricity, ${gas} kWh/month gas`;
+            
+            const providersWithCosts = providersData.providers
+                .map(p => ({...p, annualCost: calculateCost(p, electricity, gas)}))
+                .sort((a, b) => a.annualCost - b.annualCost);
+            const genesisProvider = providersData.providers.find(p => p.name === "Genesis Energy");
+            const genesisCost = calculateCost(genesisProvider, electricity, gas);
+            const genesisItemized = calculateItemizedCost(genesisProvider, electricity, gas);
+            
+            document.getElementById('estimatedElecCost').textContent = '$' + genesisItemized.electricity.toLocaleString('en-NZ', {minimumFractionDigits: 2});
+            document.getElementById('estimatedGasCost').textContent = '$' + genesisItemized.gas.toLocaleString('en-NZ', {minimumFractionDigits: 2});
+            document.getElementById('estimatedElecDailyCharge').textContent = '$' + genesisItemized.electricityDailyCharge.toLocaleString('en-NZ', {minimumFractionDigits: 2}) + '/day';
+            document.getElementById('estimatedGasDailyCharge').textContent = '$' + genesisItemized.gasDailyCharge.toLocaleString('en-NZ', {minimumFractionDigits: 2}) + '/day';
+            document.getElementById('estimatedCost').textContent = '$' + genesisCost.toLocaleString('en-NZ', {minimumFractionDigits: 2});
+            
+            // Update Genesis baseline for comparison
+            document.getElementById('genesisAnnualCost').textContent = '$' + genesisCost.toLocaleString('en-NZ', {minimumFractionDigits: 2});
+            document.getElementById('genesisElecRate').textContent = (genesisProvider.electricityRate * 100).toFixed(2) + '¢';
+            document.getElementById('genesisGasRate').textContent = (genesisProvider.gasRate * 100).toFixed(2) + '¢';
+            
+            // Populate comparison dropdown
+            const compareSelect = document.getElementById('compareProvider');
+            if (compareSelect.options.length === 1) {  // Only populate once
+                providersWithCosts.forEach(provider => {
+                    if (provider.name !== "Genesis Energy") {
+                        const option = document.createElement('option');
+                        option.value = provider.name;
+                        option.textContent = provider.name;
+                        compareSelect.appendChild(option);
+                    }
+                });
+            }
+            
+             
+            const grid = document.getElementById('providersGrid');
+            grid.innerHTML = '';
+
+            providersWithCosts.forEach((provider, index) => {
+                const savings = genesisCost - provider.annualCost;
+                const isBest = index === 0;
+                const isCurrent = provider.name === "Genesis Energy";
+                
+                const itemized = calculateItemizedCost(provider, electricity, gas);
+                
+                const card = document.createElement('div');
+                card.className = 'provider-card' + (isBest ? ' best' : '') + (isCurrent ? ' current' : '');
+                
+                let savingsHTML = '';
+                if (!isCurrent) {
+                    if (savings > 0) savingsHTML = `<div class="savings">Save $${savings.toLocaleString('en-NZ', {minimumFractionDigits: 2})}/year</div>`;
+                    else if (savings < 0) savingsHTML = `<div class="savings negative">Cost increase $${Math.abs(savings).toLocaleString('en-NZ', {minimumFractionDigits: 2})}/year</div>`;
+                }
+                
+                card.innerHTML = `
+                    <div class="provider-name">${provider.name}</div>
+                    <div class="provider-cost">$${provider.annualCost.toLocaleString('en-NZ', {minimumFractionDigits: 2})}</div>
+                    <div class="provider-cost-label">per year</div>
+                    <div class="provider-itemized">
+                        <div class="provider-itemized-item">
+                            <div class="provider-itemized-label">⚡ Electricity</div>
+                            <div class="provider-itemized-value">$${itemized.electricity.toLocaleString('en-NZ', {minimumFractionDigits: 2})}</div>
+                        </div>
+                        <div class="provider-itemized-item">
+                            <div class="provider-itemized-label">🔥 Gas</div>
+                            <div class="provider-itemized-value">$${itemized.gas.toLocaleString('en-NZ', {minimumFractionDigits: 2})}</div>
+                        </div>
+                    </div>
+                    ${savingsHTML}
+                    <div class="plan-info"><strong>Plan:</strong> ${provider.plan}<br><strong>Contract:</strong> ${provider.contract_term}</div>
+                    <div class="rating">${provider.rating}</div>
+                    <div class="highlights"><ul>${provider.highlights.map(h => `<li>${h}</li>`).join('')}</ul></div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+        
+        function updateComparison() {
+            if (!providersData) {
+                return;
+            }
+            const selectedProvider = document.getElementById('compareProvider').value;
+            const comparisonDetails = document.getElementById('comparisonDetails');
+            
+            if (!selectedProvider) {
+                comparisonDetails.style.display = 'none';
+                return;
+            }
+            
+            const electricity = parseFloat(document.getElementById('electricity').value) || 385;
+            const gas = parseFloat(document.getElementById('gas').value) || 270;
+            
+            // Get Genesis and selected provider
+            const genesisProvider = providersData.providers.find(p => p.name === "Genesis Energy");
+            const selectedProviderObj = providersData.providers.find(p => p.name === selectedProvider);
+            const genesisComponents = calculateItemizedCost(genesisProvider, electricity, gas);
+            const selectedComponents = calculateItemizedCost(selectedProviderObj, electricity, gas);
+            
+            // Calculate costs
+            const genesisCost = calculateCost(genesisProvider, electricity, gas);
+            const selectedCost = calculateCost(selectedProviderObj, electricity, gas);
+            const savings = genesisCost - selectedCost;
+            
+            // Calculate electricity annual cost
+            const genesisElecAnnual = electricity * 12 * genesisProvider.electricityRate;
+            const selectedElecAnnual = electricity * 12 * selectedProviderObj.electricityRate;
+            const elecSavings = genesisElecAnnual - selectedElecAnnual;
+            
+            // Calculate gas annual cost
+            const genesisGasAnnual = gas * 12 * genesisProvider.gasRate;
+            const selectedGasAnnual = gas * 12 * selectedProviderObj.gasRate;
+            const gasSavings = genesisGasAnnual - selectedGasAnnual;
+            
+            // Update header
+            document.getElementById('compareProviderName').textContent = selectedProvider;
+            document.getElementById('compareHeaderName').textContent = selectedProvider;
+            
+            // Update rates
+            document.getElementById('compareElecRate').textContent = (selectedProviderObj.electricityRate * 100).toFixed(2) + '¢';
+            document.getElementById('compareGasRate').textContent = (selectedProviderObj.gasRate * 100).toFixed(2) + '¢';
+            document.getElementById('genesisElecDailyCharge').textContent = '$' + genesisComponents.electricityDailyCharge.toLocaleString('en-NZ', {minimumFractionDigits: 2}) + '/day';
+            document.getElementById('genesisGasDailyCharge').textContent = '$' + genesisComponents.gasDailyCharge.toLocaleString('en-NZ', {minimumFractionDigits: 2}) + '/day';
+            document.getElementById('compareElecDailyCharge').textContent = '$' + selectedComponents.electricityDailyCharge.toLocaleString('en-NZ', {minimumFractionDigits: 2}) + '/day';
+            document.getElementById('compareGasDailyCharge').textContent = '$' + selectedComponents.gasDailyCharge.toLocaleString('en-NZ', {minimumFractionDigits: 2}) + '/day';
+            
+            // Update rate differences
+            const elecRateDiff = (genesisProvider.electricityRate - selectedProviderObj.electricityRate) * 100;
+            const gasRateDiff = (genesisProvider.gasRate - selectedProviderObj.gasRate) * 100;
+            document.getElementById('compareElecRateDiff').textContent = elecRateDiff >= 0 ? `-${elecRateDiff.toFixed(2)}¢` : `+${Math.abs(elecRateDiff).toFixed(2)}¢`;
+            document.getElementById('compareGasRateDiff').textContent = gasRateDiff >= 0 ? `-${gasRateDiff.toFixed(2)}¢` : `+${Math.abs(gasRateDiff).toFixed(2)}¢`;
+            const elecDailyDiff = genesisComponents.electricityDailyCharge - selectedComponents.electricityDailyCharge;
+            const gasDailyDiff = genesisComponents.gasDailyCharge - selectedComponents.gasDailyCharge;
+            document.getElementById('compareElecDailyChargeDiff').textContent = elecDailyDiff >= 0 ? `-$${elecDailyDiff.toFixed(2)}/day` : `+$${Math.abs(elecDailyDiff).toFixed(2)}/day`;
+            document.getElementById('compareGasDailyChargeDiff').textContent = gasDailyDiff >= 0 ? `-$${gasDailyDiff.toFixed(2)}/day` : `+$${Math.abs(gasDailyDiff).toFixed(2)}/day`;
+            
+            // Update annual costs
+            document.getElementById('compareAnnualCost').textContent = '$' + selectedCost.toLocaleString('en-NZ', {minimumFractionDigits: 2});
+            
+            // Update savings with color
+            const savingsEl = document.getElementById('compareAnnualSavings');
+            if (savings > 0) {
+                savingsEl.textContent = 'Save $' + savings.toLocaleString('en-NZ', {minimumFractionDigits: 2});
+                savingsEl.style.color = '#2e7d32';
+            } else if (savings < 0) {
+                savingsEl.textContent = 'Cost $' + Math.abs(savings).toLocaleString('en-NZ', {minimumFractionDigits: 2});
+                savingsEl.style.color = '#c62828';
+            } else {
+                savingsEl.textContent = 'Same';
+                savingsEl.style.color = '#666';
+            }
+            
+            comparisonDetails.style.display = 'block';
+        }
+        
+        document.getElementById('electricity').addEventListener('input', updateDisplay);
+        document.getElementById('electricity').addEventListener('input', updateComparison);
+        document.getElementById('gas').addEventListener('input', updateDisplay);
+        document.getElementById('gas').addEventListener('input', updateComparison);
+        document.getElementById('compareProvider').addEventListener('change', updateComparison);
+        
+        // Handle bill upload
+        document.getElementById('uploadBtn').addEventListener('click', async () => {
+            const fileInput = document.getElementById('billUpload');
+            const statusDiv = document.getElementById('uploadStatus');
+            
+            if (!fileInput.files.length) {
+                statusDiv.textContent = '⚠️ Please select a PDF file';
+                statusDiv.style.display = 'block';
+                statusDiv.style.background = '#ffebee';
+                statusDiv.style.color = '#c62828';
+                return;
+            }
+            
+            statusDiv.textContent = '⏳ Extracting data...';
+            statusDiv.style.display = 'block';
+            statusDiv.style.background = '#e3f2fd';
+            statusDiv.style.color = '#1976d2';
+            
+            const formData = new FormData();
+            formData.append('bill', fileInput.files[0]);
+            
+            try {
+                const usage = await extractUsageFromPdfFile(fileInput.files[0]);
+                document.getElementById('electricity').value = Math.round(usage.electricity);
+                document.getElementById('gas').value = Math.round(usage.gas);
+                statusDiv.textContent = `✓ Extracted: ${Math.round(usage.electricity)} kWh electricity, ${Math.round(usage.gas)} kWh gas`;
+                statusDiv.style.background = '#e8f5e9';
+                statusDiv.style.color = '#2e7d32';
+                updateDisplay();
+                updateComparison();
+            } catch (error) {
+                statusDiv.textContent = `❌ Upload failed: ${error.message}`;
+                statusDiv.style.background = '#ffebee';
+                statusDiv.style.color = '#c62828';
+            }
+        });
+
+        async function initializeApp() {
+            try {
+                providersData = await loadProvidersData();
+                document.getElementById('dataDate').textContent = providersData.last_updated;
+                document.getElementById('lastUpdated').textContent = providersData.last_updated;
+                updateDisplay();
+            } catch (error) {
+                const status = document.getElementById('status');
+                if (status) {
+                    status.textContent = '❌ ' + error.message;
+                }
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeApp);
+        } else {
+            initializeApp();
+        }
+        document.getElementById('updateBtn').addEventListener('click', updateRates);
+    </script>
+</body>
+</html>

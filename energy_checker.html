@@ -26,9 +26,9 @@
         .provider-card { border: 1px solid #ddd; border-radius: 8px; padding: 25px; transition: all 0.3s; position: relative; }
         .provider-card:hover { box-shadow: 0 10px 30px rgba(102,126,234,0.2); transform: translateY(-5px); border-color: #667eea; }
         .provider-card.best { border: 2px solid #ffc107; background: #fffbf0; }
-        .provider-card.best::before { content: '⭐ BEST RATE'; position: absolute; top: 10px; right: 10px; background: #ffc107; color: #333; padding: 5px 10px; border-radius: 4px; font-weight: 600; font-size: 0.9em; }
+        .provider-card.best::before { content: 'â­ BEST RATE'; position: absolute; top: 10px; right: 10px; background: #ffc107; color: #333; padding: 5px 10px; border-radius: 4px; font-weight: 600; font-size: 0.9em; }
         .provider-card.current { border: 2px solid #28a745; background: #f0fff4; }
-        .provider-card.current::after { content: '📍 YOUR CURRENT'; position: absolute; top: 10px; right: 10px; background: #28a745; color: white; padding: 5px 10px; border-radius: 4px; font-weight: 600; font-size: 0.9em; }
+        .provider-card.current::after { content: 'ðŸ“ YOUR CURRENT'; position: absolute; top: 10px; right: 10px; background: #28a745; color: white; padding: 5px 10px; border-radius: 4px; font-weight: 600; font-size: 0.9em; }
         .provider-name { font-size: 1.4em; font-weight: 700; margin-bottom: 15px; color: #333; margin-top: 20px; }
         .provider-cost { font-size: 2em; font-weight: 700; color: #667eea; margin-bottom: 10px; }
         .provider-cost-label { color: #666; font-size: 0.9em; }
@@ -40,7 +40,7 @@
         .highlights { margin-top: 15px; font-size: 0.9em; }
         .highlights ul { list-style: none; }
         .highlights li { padding: 5px 0; color: #666; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 8px; }
-        .highlights li:before { content: '✓ '; color: #667eea; font-weight: 600; margin-right: 5px; }
+        .highlights li:before { content: 'âœ“ '; color: #667eea; font-weight: 600; margin-right: 5px; }
         .highlights li:last-child { border-bottom: none; margin-bottom: 0; }
         .summary { background: #f0f4ff; padding: 25px; border-radius: 8px; margin-top: 30px; border-left: 4px solid #667eea; }
         .summary h3 { color: #667eea; margin-bottom: 15px; font-size: 1.2em; }
@@ -68,20 +68,20 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>⚡ Auckland Energy Provider Checker</h1>
+            <h1>âš¡ Auckland Energy Provider Checker</h1>
             <p>Find the best energy deal for your household</p>
             <div class="data-info">
-                📅 Data Updated: <strong id="dataDate">October 12, 2026 at 11:35 PM</strong>
+                ðŸ“… Data Updated: <strong id="dataDate">October 12, 2026 at 11:35 PM</strong>
             </div>
             <div class="header-controls">
-                <button class="update-btn" id="updateBtn" type="button">🔄 Update Now</button>
+                <button class="update-btn" id="updateBtn" type="button">ðŸ”„ Update Now</button>
                 <div class="status" id="status"></div>
             </div>
         </div>
         
         <div class="content">
             <div class="usage-section">
-                <h2>📊 Your Monthly Usage</h2>
+                <h2>ðŸ“Š Your Monthly Usage</h2>
                 <div class="input-group">
                     <div class="input-field">
                         <label for="electricity">Electricity (kWh/month)</label>
@@ -94,16 +94,16 @@
                 </div>
                 
                 <div style="margin-top: 20px; padding: 20px; background: #fff9e6; border-left: 4px solid #ffc107; border-radius: 4px;">
-                    <label style="display: block; font-weight: 600; margin-bottom: 10px; color: #333;">📄 Or extract from your bill:</label>
+                    <label style="display: block; font-weight: 600; margin-bottom: 10px; color: #333;">ðŸ“„ Or extract from your bill:</label>
                     <div style="display: flex; gap: 10px; align-items: center;">
                         <input type="file" id="billUpload" accept=".pdf" style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;">
                         <button id="uploadBtn" style="padding: 10px 20px; background: #ffc107; color: #333; border: none; border-radius: 4px; font-weight: 600; cursor: pointer; white-space: nowrap;">Extract Data</button>
                     </div>
-                    <p style="color: #666; font-size: 0.85em; margin-top: 8px;">✓ Supports: Genesis, Mercury, Contact, Meridian, Powershop, Vector</p>
+                    <p style="color: #666; font-size: 0.85em; margin-top: 8px;">âœ“ Supports: Genesis, Mercury, Contact, Meridian, Powershop, Vector</p>
                     <div id="uploadStatus" style="margin-top: 10px; display: none; padding: 10px; border-radius: 4px; font-size: 0.9em;"></div>
                 </div>
                 
-                <p style="color: #666; font-size: 0.95em; margin-top: 15px;">💡 <strong>Tip:</strong> Your bill data is extracted locally and never stored</p>
+                <p style="color: #666; font-size: 0.95em; margin-top: 15px;">ðŸ’¡ <strong>Tip:</strong> Your bill data is extracted locally and never stored</p>
             </div>
             
             <div class="summary">
@@ -111,28 +111,28 @@
                 <div class="summary-item">Monthly usage: <strong id="usageDisplay">385 kWh/month electricity, 270 kWh/month gas</strong></div>
                 <div class="cost-breakdown">
                     <div class="cost-item electricity">
-                        <div class="cost-item-label">⚡ Electricity Annual Cost</div>
+                        <div class="cost-item-label">âš¡ Electricity Annual Cost</div>
                         <div class="cost-item-value" id="estimatedElecCost">$1,472.55</div>
                     </div>
                     <div class="cost-item gas">
-                        <div class="cost-item-label">🔥 Gas Annual Cost</div>
+                        <div class="cost-item-label">ðŸ”¥ Gas Annual Cost</div>
                         <div class="cost-item-value" id="estimatedGasCost">$1,236.40</div>
                     </div>
                 </div>
                 <div class="cost-breakdown">
                     <div class="cost-item electricity">
-                        <div class="cost-item-label">⚡ Electricity Daily Charge</div>
+                        <div class="cost-item-label">âš¡ Electricity Daily Charge</div>
                         <div class="cost-item-value" id="estimatedElecDailyCharge">$1.25/day</div>
                     </div>
                     <div class="cost-item gas">
-                        <div class="cost-item-label">🔥 Gas Daily Charge</div>
+                        <div class="cost-item-label">ðŸ”¥ Gas Daily Charge</div>
                         <div class="cost-item-value" id="estimatedGasDailyCharge">$0.51/day</div>
                     </div>
                 </div>
                 <div class="summary-item">Total annual cost: <strong id="estimatedCost">$2,708.95</strong></div>
                 
                 <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(102, 126, 234, 0.2);">
-                    <label for="compareProvider" style="font-weight: 600; color: #667eea; display: block; margin-bottom: 10px;">📊 Compare with another provider:</label>
+                    <label for="compareProvider" style="font-weight: 600; color: #667eea; display: block; margin-bottom: 10px;">ðŸ“Š Compare with another provider:</label>
                     <select id="compareProvider" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 1em; margin-bottom: 15px;">
                         <option value="">-- Select a provider to compare --</option>
                     </select>
@@ -147,12 +147,12 @@
                                 <div style="padding: 12px; border-bottom: 1px solid #ddd; font-weight: 600; background: #f8f9fa; text-align: center;">Difference</div>
                                 
                                 <div style="padding: 12px; border-right: 1px solid #ddd;">Electricity Rate</div>
-                                <div style="padding: 12px; border-right: 1px solid #ddd; text-align: center;" id="genesisElecRate">31.75¢</div>
+                                <div style="padding: 12px; border-right: 1px solid #ddd; text-align: center;" id="genesisElecRate">31.75Â¢</div>
                                 <div style="padding: 12px; border-right: 1px solid #ddd; text-align: center;" id="compareElecRate">--</div>
                                 <div style="padding: 12px; text-align: center; color: #2e7d32;" id="compareElecRateDiff">--</div>
                                 
                                 <div style="padding: 12px; border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;">Gas Rate</div>
-                                <div style="padding: 12px; border-right: 1px solid #ddd; border-bottom: 1px solid #ddd; text-align: center;" id="genesisGasRate">18.45¢</div>
+                                <div style="padding: 12px; border-right: 1px solid #ddd; border-bottom: 1px solid #ddd; text-align: center;" id="genesisGasRate">18.45Â¢</div>
                                 <div style="padding: 12px; border-right: 1px solid #ddd; border-bottom: 1px solid #ddd; text-align: center;" id="compareGasRate">--</div>
                                 <div style="padding: 12px; border-bottom: 1px solid #ddd; text-align: center; color: #2e7d32;" id="compareGasRateDiff">--</div>
 
@@ -184,15 +184,16 @@
         </div>
         
         <div class="footer">
-            📊 Data Source: Powerswitch.org.nz | Last Updated: <span id="lastUpdated">October 12, 2026 at 11:35 PM</span>
+            ðŸ“Š Data Source: Powerswitch.org.nz | Last Updated: <span id="lastUpdated">October 12, 2026 at 11:35 PM</span>
         </div>
     </div>
     
     <script>
         let providersData = null;
 
-        async function loadProvidersData() {
-            const response = await fetch('providers_data.json', { cache: 'no-store' });
+        async function loadProvidersData(options = {}) {
+            const cacheBust = options.bustCache ? `?t=${Date.now()}` : '';
+            const response = await fetch(`providers_data.json${cacheBust}`, { cache: 'no-store' });
             if (!response.ok) {
                 throw new Error('Could not load provider data');
             }
@@ -356,17 +357,17 @@
             const status = document.getElementById('status');
 
             btn.disabled = true;
-            status.textContent = '🔄 Refreshing published data...';
+            status.textContent = 'ðŸ”„ Refreshing published data...';
 
             try {
-                providersData = await loadProvidersData();
+                providersData = await loadProvidersData({ bustCache: true });
                 document.getElementById('dataDate').textContent = providersData.last_updated;
                 document.getElementById('lastUpdated').textContent = providersData.last_updated;
                 updateDisplay();
-                status.textContent = '✅ Updated successfully';
-                setTimeout(function () { status.textContent = ''; }, 2500);
+                status.textContent = 'âœ… Published data reloaded';
+                setTimeout(function () { status.textContent = ''; }, 4000);
             } catch (error) {
-                status.textContent = '❌ ' + error.message;
+                status.textContent = 'âŒ ' + error.message;
             } finally {
                 btn.disabled = false;
             }
@@ -396,8 +397,8 @@
             
             // Update Genesis baseline for comparison
             document.getElementById('genesisAnnualCost').textContent = '$' + genesisCost.toLocaleString('en-NZ', {minimumFractionDigits: 2});
-            document.getElementById('genesisElecRate').textContent = (genesisProvider.electricityRate * 100).toFixed(2) + '¢';
-            document.getElementById('genesisGasRate').textContent = (genesisProvider.gasRate * 100).toFixed(2) + '¢';
+            document.getElementById('genesisElecRate').textContent = (genesisProvider.electricityRate * 100).toFixed(2) + 'Â¢';
+            document.getElementById('genesisGasRate').textContent = (genesisProvider.gasRate * 100).toFixed(2) + 'Â¢';
             
             // Populate comparison dropdown
             const compareSelect = document.getElementById('compareProvider');
@@ -438,11 +439,11 @@
                     <div class="provider-cost-label">per year</div>
                     <div class="provider-itemized">
                         <div class="provider-itemized-item">
-                            <div class="provider-itemized-label">⚡ Electricity</div>
+                            <div class="provider-itemized-label">âš¡ Electricity</div>
                             <div class="provider-itemized-value">$${itemized.electricity.toLocaleString('en-NZ', {minimumFractionDigits: 2})}</div>
                         </div>
                         <div class="provider-itemized-item">
-                            <div class="provider-itemized-label">🔥 Gas</div>
+                            <div class="provider-itemized-label">ðŸ”¥ Gas</div>
                             <div class="provider-itemized-value">$${itemized.gas.toLocaleString('en-NZ', {minimumFractionDigits: 2})}</div>
                         </div>
                     </div>
@@ -496,8 +497,8 @@
             document.getElementById('compareHeaderName').textContent = selectedProvider;
             
             // Update rates
-            document.getElementById('compareElecRate').textContent = (selectedProviderObj.electricityRate * 100).toFixed(2) + '¢';
-            document.getElementById('compareGasRate').textContent = (selectedProviderObj.gasRate * 100).toFixed(2) + '¢';
+            document.getElementById('compareElecRate').textContent = (selectedProviderObj.electricityRate * 100).toFixed(2) + 'Â¢';
+            document.getElementById('compareGasRate').textContent = (selectedProviderObj.gasRate * 100).toFixed(2) + 'Â¢';
             document.getElementById('genesisElecDailyCharge').textContent = '$' + genesisComponents.electricityDailyCharge.toLocaleString('en-NZ', {minimumFractionDigits: 2}) + '/day';
             document.getElementById('genesisGasDailyCharge').textContent = '$' + genesisComponents.gasDailyCharge.toLocaleString('en-NZ', {minimumFractionDigits: 2}) + '/day';
             document.getElementById('compareElecDailyCharge').textContent = '$' + selectedComponents.electricityDailyCharge.toLocaleString('en-NZ', {minimumFractionDigits: 2}) + '/day';
@@ -506,8 +507,8 @@
             // Update rate differences
             const elecRateDiff = (genesisProvider.electricityRate - selectedProviderObj.electricityRate) * 100;
             const gasRateDiff = (genesisProvider.gasRate - selectedProviderObj.gasRate) * 100;
-            document.getElementById('compareElecRateDiff').textContent = elecRateDiff >= 0 ? `-${elecRateDiff.toFixed(2)}¢` : `+${Math.abs(elecRateDiff).toFixed(2)}¢`;
-            document.getElementById('compareGasRateDiff').textContent = gasRateDiff >= 0 ? `-${gasRateDiff.toFixed(2)}¢` : `+${Math.abs(gasRateDiff).toFixed(2)}¢`;
+            document.getElementById('compareElecRateDiff').textContent = elecRateDiff >= 0 ? `-${elecRateDiff.toFixed(2)}Â¢` : `+${Math.abs(elecRateDiff).toFixed(2)}Â¢`;
+            document.getElementById('compareGasRateDiff').textContent = gasRateDiff >= 0 ? `-${gasRateDiff.toFixed(2)}Â¢` : `+${Math.abs(gasRateDiff).toFixed(2)}Â¢`;
             const elecDailyDiff = genesisComponents.electricityDailyCharge - selectedComponents.electricityDailyCharge;
             const gasDailyDiff = genesisComponents.gasDailyCharge - selectedComponents.gasDailyCharge;
             document.getElementById('compareElecDailyChargeDiff').textContent = elecDailyDiff >= 0 ? `-$${elecDailyDiff.toFixed(2)}/day` : `+$${Math.abs(elecDailyDiff).toFixed(2)}/day`;
@@ -544,14 +545,14 @@
             const statusDiv = document.getElementById('uploadStatus');
             
             if (!fileInput.files.length) {
-                statusDiv.textContent = '⚠️ Please select a PDF file';
+                statusDiv.textContent = 'âš ï¸ Please select a PDF file';
                 statusDiv.style.display = 'block';
                 statusDiv.style.background = '#ffebee';
                 statusDiv.style.color = '#c62828';
                 return;
             }
             
-            statusDiv.textContent = '⏳ Extracting data...';
+            statusDiv.textContent = 'â³ Extracting data...';
             statusDiv.style.display = 'block';
             statusDiv.style.background = '#e3f2fd';
             statusDiv.style.color = '#1976d2';
@@ -563,13 +564,13 @@
                 const usage = await extractUsageFromPdfFile(fileInput.files[0]);
                 document.getElementById('electricity').value = Math.round(usage.electricity);
                 document.getElementById('gas').value = Math.round(usage.gas);
-                statusDiv.textContent = `✓ Extracted: ${Math.round(usage.electricity)} kWh electricity, ${Math.round(usage.gas)} kWh gas`;
+                statusDiv.textContent = `âœ“ Extracted: ${Math.round(usage.electricity)} kWh electricity, ${Math.round(usage.gas)} kWh gas`;
                 statusDiv.style.background = '#e8f5e9';
                 statusDiv.style.color = '#2e7d32';
                 updateDisplay();
                 updateComparison();
             } catch (error) {
-                statusDiv.textContent = `❌ Upload failed: ${error.message}`;
+                statusDiv.textContent = `âŒ Upload failed: ${error.message}`;
                 statusDiv.style.background = '#ffebee';
                 statusDiv.style.color = '#c62828';
             }
@@ -584,7 +585,7 @@
             } catch (error) {
                 const status = document.getElementById('status');
                 if (status) {
-                    status.textContent = '❌ ' + error.message;
+                    status.textContent = 'âŒ ' + error.message;
                 }
             }
         }

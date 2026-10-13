@@ -40,7 +40,7 @@
         .highlights { margin-top: 15px; font-size: 0.9em; }
         .highlights ul { list-style: none; }
         .highlights li { padding: 5px 0; color: #666; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 8px; }
-        .highlights li:before { content: 'â€¢ '; color: #667eea; font-weight: 600; margin-right: 5px; }
+        .highlights li:before { content: 'â€ c/kWh '; color: #667eea; font-weight: 600; margin-right: 5px; }
         .highlights li:last-child { border-bottom: none; margin-bottom: 0; }
         .summary { background: #f0f4ff; padding: 25px; border-radius: 8px; margin-top: 30px; border-left: 4px solid #667eea; }
         .summary h3 { color: #667eea; margin-bottom: 15px; font-size: 1.2em; }
@@ -147,12 +147,12 @@
                                 <div style="padding: 12px; border-bottom: 1px solid #ddd; font-weight: 600; background: #f8f9fa; text-align: center;">Difference</div>
                                 
                                 <div style="padding: 12px; border-right: 1px solid #ddd;">Electricity Rate</div>
-                                <div style="padding: 12px; border-right: 1px solid #ddd; text-align: center;" id="genesisElecRate">31.75Â¢</div>
+                                <div style="padding: 12px; border-right: 1px solid #ddd; text-align: center;" id="genesisElecRate">31.75Â c/kWh</div>
                                 <div style="padding: 12px; border-right: 1px solid #ddd; text-align: center;" id="compareElecRate">--</div>
                                 <div style="padding: 12px; text-align: center; color: #2e7d32;" id="compareElecRateDiff">--</div>
                                 
                                 <div style="padding: 12px; border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;">Gas Rate</div>
-                                <div style="padding: 12px; border-right: 1px solid #ddd; border-bottom: 1px solid #ddd; text-align: center;" id="genesisGasRate">18.45Â¢</div>
+                                <div style="padding: 12px; border-right: 1px solid #ddd; border-bottom: 1px solid #ddd; text-align: center;" id="genesisGasRate">18.45Â c/kWh</div>
                                 <div style="padding: 12px; border-right: 1px solid #ddd; border-bottom: 1px solid #ddd; text-align: center;" id="compareGasRate">--</div>
                                 <div style="padding: 12px; border-bottom: 1px solid #ddd; text-align: center; color: #2e7d32;" id="compareGasRateDiff">--</div>
 
@@ -424,8 +424,8 @@
             
             // Update Genesis baseline for comparison
             document.getElementById('genesisAnnualCost').textContent = '$' + genesisCost.toLocaleString('en-NZ', {minimumFractionDigits: 2});
-            document.getElementById('genesisElecRate').textContent = (genesisProvider.electricityRate * 100).toFixed(2) + 'Â¢';
-            document.getElementById('genesisGasRate').textContent = (genesisProvider.gasRate * 100).toFixed(2) + 'Â¢';
+            document.getElementById('genesisElecRate').textContent = (genesisProvider.electricityRate * 100).toFixed(2) + 'Â c/kWh';
+            document.getElementById('genesisGasRate').textContent = (genesisProvider.gasRate * 100).toFixed(2) + 'Â c/kWh';
             
             // Populate comparison dropdown
             const compareSelect = document.getElementById('compareProvider');
@@ -524,8 +524,8 @@
             document.getElementById('compareHeaderName').textContent = selectedProvider;
             
             // Update rates
-            document.getElementById('compareElecRate').textContent = (selectedProviderObj.electricityRate * 100).toFixed(2) + 'Â¢';
-            document.getElementById('compareGasRate').textContent = (selectedProviderObj.gasRate * 100).toFixed(2) + 'Â¢';
+            document.getElementById('compareElecRate').textContent = (selectedProviderObj.electricityRate * 100).toFixed(2) + 'Â c/kWh';
+            document.getElementById('compareGasRate').textContent = (selectedProviderObj.gasRate * 100).toFixed(2) + 'Â c/kWh';
             document.getElementById('genesisElecDailyCharge').textContent = '$' + genesisComponents.electricityDailyCharge.toLocaleString('en-NZ', {minimumFractionDigits: 2}) + '/day';
             document.getElementById('genesisGasDailyCharge').textContent = '$' + genesisComponents.gasDailyCharge.toLocaleString('en-NZ', {minimumFractionDigits: 2}) + '/day';
             document.getElementById('compareElecDailyCharge').textContent = '$' + selectedComponents.electricityDailyCharge.toLocaleString('en-NZ', {minimumFractionDigits: 2}) + '/day';
@@ -534,8 +534,8 @@
             // Update rate differences
             const elecRateDiff = (genesisProvider.electricityRate - selectedProviderObj.electricityRate) * 100;
             const gasRateDiff = (genesisProvider.gasRate - selectedProviderObj.gasRate) * 100;
-            document.getElementById('compareElecRateDiff').textContent = elecRateDiff >= 0 ? `-${elecRateDiff.toFixed(2)}Â¢` : `+${Math.abs(elecRateDiff).toFixed(2)}Â¢`;
-            document.getElementById('compareGasRateDiff').textContent = gasRateDiff >= 0 ? `-${gasRateDiff.toFixed(2)}Â¢` : `+${Math.abs(gasRateDiff).toFixed(2)}Â¢`;
+            document.getElementById('compareElecRateDiff').textContent = elecRateDiff >= 0 ? `-${elecRateDiff.toFixed(2)}Â c/kWh` : `+${Math.abs(elecRateDiff).toFixed(2)}Â c/kWh`;
+            document.getElementById('compareGasRateDiff').textContent = gasRateDiff >= 0 ? `-${gasRateDiff.toFixed(2)}Â c/kWh` : `+${Math.abs(gasRateDiff).toFixed(2)}Â c/kWh`;
             const elecDailyDiff = genesisComponents.electricityDailyCharge - selectedComponents.electricityDailyCharge;
             const gasDailyDiff = genesisComponents.gasDailyCharge - selectedComponents.gasDailyCharge;
             document.getElementById('compareElecDailyChargeDiff').textContent = elecDailyDiff >= 0 ? `-$${elecDailyDiff.toFixed(2)}/day` : `+$${Math.abs(elecDailyDiff).toFixed(2)}/day`;

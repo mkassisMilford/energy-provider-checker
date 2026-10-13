@@ -351,7 +351,7 @@
             const electricityUsage = electricity * 12 * provider.electricityRate;
             const gasUsage = gas * 12 * provider.gasRate;
             const preDiscountTotal = electricityUsage + gasUsage + fixedAnnual;
-            const total = targetAnnual || (preDiscountTotal * discountFactor);
+            const total = preDiscountTotal * discountFactor;
 
             return {
                 electricityUsage: Math.round(electricityUsage * 100) / 100,
